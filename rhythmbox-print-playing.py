@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from subprocess import Popen, PIPE
 
 
@@ -26,8 +27,9 @@ def log_playing_song(info_in):
     info_in.append(time)
     info_out = ', '.join(info_in)
 
-    with open('song_list.csv', 'a') as f:
-        f.write(info_out)
+    f = open('song_list.csv', 'a')
+    f.write(info_out)
+    f.close()
 
 
 shell_call('notify-send', ['--icon=/usr/share/icons/hicolor/48x48/apps/rhythmbox.png'] + get_playing_song(), None)
