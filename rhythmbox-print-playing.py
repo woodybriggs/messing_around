@@ -29,10 +29,11 @@ def log_playing_song():
     info_in.append(time)
     info_out = ', '.join(info_in)
 
-    # write data 
+    # write data
     f = open('song_list.csv', 'a')
     f.write(info_out)
     f.close()
+
 
 shell_call(['notify-send', '--icon=/usr/share/icons/hicolor/48x48/apps/rhythmbox.png'] + get_playing(), None)
 log_playing_song()
