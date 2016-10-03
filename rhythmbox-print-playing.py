@@ -2,6 +2,7 @@
 from subprocess import Popen, PIPE
 import time
 
+
 def shell_call(prog, _std_arg):
     call = Popen(prog, stdout=_std_arg, stderr=_std_arg)
     stdout_val, stderr_val = call.communicate()
@@ -25,14 +26,16 @@ def get_playing_body():
 def log_playing_song():
     # format data
     info_in = get_playing()
-    time = shell_call(['date', '+%d/%m/%Y, %T'], PIPE)
-    info_in.append(time)
-    info_out = ', '.join(info_in)
 
-    # write data
-    f = open('song_list.csv', 'a')
-    f.write(info_out)
-    f.close()
+    if info_in[0]:
+        time = shell_call(['date', '+%d/%m/%Y, %T'], PIPE)
+        info_in.append(time)
+        info_out = ', '.join(info_in)
+
+        # write data
+        f = open('song_list.csv', 'a')
+        f.write(info_out)
+        f.close()
 
 
 shell_call(['notify-send', '--icon=/usr/share/icons/hicolor/48x48/apps/rhythmbox.png'] + get_playing(), None)
