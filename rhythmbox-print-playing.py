@@ -1,35 +1,38 @@
 #!/usr/bin/env python
 from subprocess import Popen, PIPE
+import time
 
-
-def shell_call(_program, _options, _std_arg):
-    program = [_program]
-    options = []
-    for each in _options:
-        options.append(each)
-
-    call = Popen(program + options, stdout=_std_arg, stderr=_std_arg)
+def shell_call(prog, _std_arg):
+    call = Popen(prog, stdout=_std_arg, stderr=_std_arg)
     stdout_val, stderr_val = call.communicate()
     return stdout_val
 
 
+def get_playing():
+    return get_playing_song() + get_playing_body()
+
+
 def get_playing_song():
-    song = shell_call('rhythmbox-client', ['--print-playing'], PIPE)
-    rev = song[::-1].split('(', 1)
-    body = rev[0][3:][::-1]
-    song = rev[1][::-1]
-    log_playing_song([song, body])
-    return [song, body]
+    song = shell_call(['rhythmbox-client', '--print-playing-format', '%st'], PIPE).rstrip()
+    return [song]
 
 
-def log_playing_song(info_in):
-    time = shell_call('date', [], PIPE)
+def get_playing_body():
+    body = shell_call(['rhythmbox-client', '--print-playing-format', '%tt'], PIPE).rstrip()
+    return [body]
+
+
+def log_playing_song():
+    # format data
+    info_in = get_playing()
+    time = shell_call(['date', '+%d/%m/%Y, %T'], PIPE)
     info_in.append(time)
     info_out = ', '.join(info_in)
 
+    # write data 
     f = open('song_list.csv', 'a')
     f.write(info_out)
     f.close()
 
-
-shell_call('notify-send', ['--icon=/usr/share/icons/hicolor/48x48/apps/rhythmbox.png'] + get_playing_song(), None)
+shell_call(['notify-send', '--icon=/usr/share/icons/hicolor/48x48/apps/rhythmbox.png'] + get_playing(), None)
+log_playing_song()
